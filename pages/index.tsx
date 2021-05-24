@@ -1,6 +1,8 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
+import { GetStaticProps } from 'next';
+import db from '../lib/sqlite/db';
 
 export default function Home() {
   return (
@@ -14,3 +16,14 @@ export default function Home() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  await db.sync();
+  console.log(`All models were synchronized successfully.`);
+
+  return {
+    props: {
+      createdDb: true,
+    },
+  };
+};
