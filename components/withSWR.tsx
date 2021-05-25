@@ -6,11 +6,9 @@ import { ioEitherSwr } from '../lib/utils/withFetcher';
 import Err from './Err';
 import Loading from './Loading';
 
-const withComponentAndSwr =
-  <Data, Error>(
-    Component: React.FC<Record<string, unknown> & { data: Data }>
-  ) =>
-  (ioSwr: IO.IO<SWRResponse<Data, Error>>) =>
+const withSWR =
+  <Data, Error>(ioSwr: IO.IO<SWRResponse<Data, Error>>) =>
+  (Component: React.FC<Record<string, unknown> & { data: Data }>) =>
   (props: Record<string, unknown>) =>
     pipe(
       ioSwr,
@@ -28,4 +26,4 @@ const withComponentAndSwr =
       )
     )();
 
-export default withComponentAndSwr;
+export default withSWR;
