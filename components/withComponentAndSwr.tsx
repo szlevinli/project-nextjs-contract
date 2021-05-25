@@ -6,7 +6,7 @@ import { ioEitherSwr } from '../lib/utils/withFetcher';
 import Err from './Err';
 import Loading from './Loading';
 
-const withComponent =
+const withComponentAndSwr =
   <Data, Error>(
     Component: React.FC<Record<string, unknown> & { data: Data }>
   ) =>
@@ -28,4 +28,4 @@ const withComponent =
       )
     )();
 
-export default withComponent;
+export default withComponentAndSwr;
