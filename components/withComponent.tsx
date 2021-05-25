@@ -16,7 +16,7 @@ const withComponent =
       ioSwr,
       ioEitherSwr,
       IE.match(
-        (e) => <Err error={e} />,
+        (e) => <Err error={String(e)} />,
         (d) =>
           pipe(
             d,
