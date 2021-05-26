@@ -1,11 +1,11 @@
-import { pipe } from 'fp-ts/function';
-import Companies, { CompaniesProps } from '../components/Companies';
-import withSWR from '../components/withSWR';
-import withHandler from '../components/withHandler';
-import { getFetcher, postFetcher } from '../lib/axios/fetcher';
-import { ioSwr } from '../lib/utils/withFetcher';
 import axios from 'axios';
+import { pipe } from 'fp-ts/function';
 import { mutate } from 'swr';
+import Companies, { CompaniesProps } from '../components/Companies';
+import withHandler from '../components/withHandler';
+import { withSWR } from '../components/withSWR';
+import { getFetcher } from '../lib/axios/fetcher';
+import { liftSWR } from '../lib/utils/lift';
 
 const handleAddCompany: CompaniesProps['handleAddCompany'] = async ({
   name,
@@ -15,11 +15,11 @@ const handleAddCompany: CompaniesProps['handleAddCompany'] = async ({
   mutate('/api/getCompanies');
 };
 
-const swr = ioSwr<string[], unknown>('/api/getCompanies')(getFetcher);
+const ioEitherData = liftSWR<string[], string>('/api/getCompanies')(getFetcher);
 
 const CompanyPage = pipe(
   Companies,
-  withSWR(swr),
+  withSWR(ioEitherData),
   withHandler('handleAddCompany')(handleAddCompany)
 );
 

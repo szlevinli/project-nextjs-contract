@@ -1,29 +1,18 @@
-import { either as E, io as IO, ioEither as IE } from 'fp-ts';
+import { ioEither as IE } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import { is } from 'ramda';
 import React from 'react';
-import { SWRResponse } from 'swr';
-import { ioEitherSwr } from '../lib/utils/withFetcher';
 import Err from './Err';
 import Loading from './Loading';
 
-const withSWR =
-  <Data, Error>(ioSwr: IO.IO<SWRResponse<Data, Error>>) =>
-  (Component: React.FC<Record<string, unknown> & { data: Data }>) =>
-  (props: Record<string, unknown>) =>
+export const withSWR =
+  <Data, Error, Props>(ioEitherSWR: IE.IOEither<Error | string, Data>) =>
+  (Component: React.FC<Props>) =>
+  (props: Props) =>
     pipe(
-      ioSwr,
-      ioEitherSwr,
+      ioEitherSWR,
       IE.match(
-        (e) => <Err error={String(e)} />,
-        (d) =>
-          pipe(
-            d,
-            E.match(
-              () => <Loading />,
-              (data) => <Component data={data} {...props} />
-            )
-          )
+        (e) => (is(String, e) ? <Loading /> : <Err error={String(e)} />),
+        (data) => <Component {...props} data={data} />
       )
     )();
-
-export default withSWR;
