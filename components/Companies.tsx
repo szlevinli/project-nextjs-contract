@@ -8,9 +8,14 @@ export type AddCompany = {
 export type CompaniesProps = {
   data: string[];
   handleAddCompany: (company: AddCompany) => Promise<any>;
+  handleDelAllCompanies: () => Promise<unknown>;
 };
 
-const Companies: React.FC<CompaniesProps> = ({ data, handleAddCompany }) => {
+const Companies: React.FC<CompaniesProps> = ({
+  data,
+  handleAddCompany,
+  handleDelAllCompanies,
+}) => {
   const [name, setName] = React.useState('');
   const [abbr, setAbbr] = React.useState('');
 
@@ -42,6 +47,7 @@ const Companies: React.FC<CompaniesProps> = ({ data, handleAddCompany }) => {
         onChange={handleAbbrChange}
       />
       <button onClick={() => handleAddCompany({ name, abbr })}>Add</button>
+      <button onClick={handleDelAllCompanies}>Del All</button>
       <ul>
         {data.map((v, i) => (
           <li key={i}>{v}</li>
