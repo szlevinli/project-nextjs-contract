@@ -18,6 +18,7 @@ const Companies: React.FC<CompaniesProps> = ({
 }) => {
   const [name, setName] = React.useState('');
   const [abbr, setAbbr] = React.useState('');
+  const refCompanyName = React.useRef<HTMLInputElement>(null);
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -26,6 +27,20 @@ const Companies: React.FC<CompaniesProps> = ({
   const handleAbbrChange = (event: ChangeEvent<HTMLInputElement>) => {
     setAbbr(event.target.value);
   };
+
+  const add = () => {
+    handleAddCompany({ name, abbr });
+    clearInputText();
+    refCompanyName.current.focus();
+  };
+
+  const deleteAll = () => {
+    handleDelAllCompanies();
+    clearInputText();
+    refCompanyName.current.focus();
+  };
+
+  const clearInputText = () => [setName, setAbbr].forEach((fn) => fn(''));
 
   return (
     <div>
@@ -37,6 +52,7 @@ const Companies: React.FC<CompaniesProps> = ({
         name="companyName"
         value={name}
         onChange={handleNameChange}
+        ref={refCompanyName}
       />
       <label htmlFor="companyAbbr">企业简称:</label>
       <input
@@ -46,8 +62,8 @@ const Companies: React.FC<CompaniesProps> = ({
         value={abbr}
         onChange={handleAbbrChange}
       />
-      <button onClick={() => handleAddCompany({ name, abbr })}>Add</button>
-      <button onClick={handleDelAllCompanies}>Del All</button>
+      <button onClick={add}>Add</button>
+      <button onClick={deleteAll}>Del All</button>
       <ul>
         {data.map((v, i) => (
           <li key={i}>{v}</li>
