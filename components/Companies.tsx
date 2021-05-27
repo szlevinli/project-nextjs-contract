@@ -1,8 +1,13 @@
-import React, { ChangeEvent, ChangeEventHandler } from 'react';
+import React, { ChangeEvent } from 'react';
+
+export type AddCompany = {
+  name: string;
+  abbr: string;
+};
 
 export type CompaniesProps = {
   data: string[];
-  handleAddCompany: (company: { name: string; abbr: string }) => void;
+  handleAddCompany: (company: AddCompany) => Promise<any>;
 };
 
 const Companies: React.FC<CompaniesProps> = ({ data, handleAddCompany }) => {
