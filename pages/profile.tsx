@@ -1,6 +1,6 @@
-import { useUser } from '@auth0/nextjs-auth0';
+import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0';
 
-export default function Profile() {
+const Profile = () => {
   const { user, error, isLoading } = useUser();
 
   if (isLoading) return <div>Loading...</div>;
@@ -16,4 +16,6 @@ export default function Profile() {
     );
 
   return <a href="/api/auth/login">Login</a>;
-}
+};
+
+export default withPageAuthRequired(Profile);
