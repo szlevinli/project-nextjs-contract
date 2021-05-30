@@ -2,7 +2,7 @@ import { useUser } from '@auth0/nextjs-auth0';
 import { GetStaticProps } from 'next';
 import db from '../lib/sqlite/db';
 
-export default () => {
+export default function Home() {
   const { user, error, isLoading } = useUser();
 
   if (isLoading) return <div>Loading...</div>;
@@ -17,7 +17,7 @@ export default () => {
   }
 
   return <a href="/api/auth/login">Login</a>;
-};
+}
 
 export const getStaticProps: GetStaticProps = async () => {
   await db.sync();
