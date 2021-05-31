@@ -2750,6 +2750,16 @@ ini@~1.3.0:
   resolved "https://registry.npm.taobao.org/ini/download/ini-1.3.8.tgz?cache=0&sync_timestamp=1607907834147&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fini%2Fdownload%2Fini-1.3.8.tgz#a29da425b48806f34767a4efce397269af28432c"
   integrity sha1-op2kJbSIBvNHZ6Tvzjlyaa8oQyw=
 
+io-ts-reporters@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.nlark.com/io-ts-reporters/download/io-ts-reporters-1.2.2.tgz#4d3219777ea5219c7d8f6ffac01fd68e72426dd1"
+  integrity sha1-TTIZd36lIZx9j2/6wB/WjnJCbdE=
+
+io-ts@^2.2.16:
+  version "2.2.16"
+  resolved "https://registry.npm.taobao.org/io-ts/download/io-ts-2.2.16.tgz#597dffa03db1913fc318c9c6df6931cb4ed808b2"
+  integrity sha1-WX3/oD2xkT/DGMnG32kxy07YCLI=
+
 is-arguments@^1.0.4:
   version "1.1.0"
   resolved "https://registry.nlark.com/is-arguments/download/is-arguments-1.1.0.tgz#62353031dfbee07ceb34656a6bde59efecae8dd9"
