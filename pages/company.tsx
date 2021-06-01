@@ -6,6 +6,7 @@ import Companies, { AddCompany } from '../components/Companies';
 import withHandler from '../components/withHandler';
 import { withSWR } from '../components/withSWR';
 import { getFetcher } from '../lib/axios/fetcher';
+import { CompanyFields } from '../lib/sqlite/models';
 import { getHandler } from '../lib/utils/handler';
 import { liftSWR } from '../lib/utils/lift';
 
@@ -52,7 +53,8 @@ const handlerDelAllCompanies = () =>
 // query company
 // ----------------------------------------------------------------------------
 
-const ioEitherData = liftSWR<string[], string>('/api/getCompanies')(getFetcher);
+const ioEitherData =
+  liftSWR<CompanyFields[], string>('/api/getCompanies')(getFetcher);
 
 // ----------------------------------------------------------------------------
 // computation

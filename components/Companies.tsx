@@ -1,4 +1,5 @@
 import React, { ChangeEvent } from 'react';
+import { CompanyFields } from '../lib/sqlite/models';
 
 export type AddCompany = {
   name: string;
@@ -6,7 +7,7 @@ export type AddCompany = {
 };
 
 export type CompaniesProps = {
-  data: string[];
+  data: CompanyFields[];
   handleAddCompany: (company: AddCompany) => Promise<any>;
   handleDelAllCompanies: () => Promise<unknown>;
 };
@@ -65,8 +66,10 @@ const Companies: React.FC<CompaniesProps> = ({
       <button onClick={add}>Add</button>
       <button onClick={deleteAll}>Del All</button>
       <ul>
-        {data.map((v, i) => (
-          <li key={i}>{v}</li>
+        {data.map((v) => (
+          <li key={v.id}>
+            {v.id}: {JSON.stringify(v)}
+          </li>
         ))}
       </ul>
     </div>
