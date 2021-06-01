@@ -1,6 +1,8 @@
 type ErrProps = {
   error: unknown;
 };
-const Err: React.FC<ErrProps> = ({ error }) => <div>Error: {error}</div>;
+const Err: React.FC<ErrProps> = ({ error }) => (
+  <div>Error: {String(error)}</div>
+);
 
 export default Err;
