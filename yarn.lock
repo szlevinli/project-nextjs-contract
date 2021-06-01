@@ -2755,6 +2755,11 @@ io-ts-reporters@^1.2.2:
   resolved "https://registry.nlark.com/io-ts-reporters/download/io-ts-reporters-1.2.2.tgz#4d3219777ea5219c7d8f6ffac01fd68e72426dd1"
   integrity sha1-TTIZd36lIZx9j2/6wB/WjnJCbdE=
 
+io-ts-types@^0.5.16:
+  version "0.5.16"
+  resolved "https://registry.nlark.com/io-ts-types/download/io-ts-types-0.5.16.tgz#e9eed75371e217c97050cc507915e8eedc250946"
+  integrity sha1-6e7XU3HiF8lwUMxQeRXo7twlCUY=
+
 io-ts@^2.2.16:
   version "2.2.16"
   resolved "https://registry.npm.taobao.org/io-ts/download/io-ts-2.2.16.tgz#597dffa03db1913fc318c9c6df6931cb4ed808b2"
