@@ -1,70 +1,86 @@
-import axios, { AxiosResponse } from 'axios';
-import { task as T } from 'fp-ts';
-import { pipe } from 'fp-ts/function';
+import axios from 'axios';
+import { fold } from 'fp-ts/Either';
+import { pipe } from 'fp-ts/lib/function';
+import { tryCatch } from 'fp-ts/TaskEither';
+import { useSnackbar } from 'notistack';
 import { mutate } from 'swr';
 import Companies, { AddCompany } from '../components/Companies';
-import withHandler from '../components/withHandler';
-import { withSWR } from '../components/withSWR';
+import Err from '../components/Err';
+import Fetchable from '../components/Fetchable';
+import Loading from '../components/Loading';
 import { getFetcher } from '../lib/axios/fetcher';
 import { CompanyFields } from '../lib/sqlite/models';
-import { getHandler } from '../lib/utils/handler';
-import { liftSWR } from '../lib/utils/lift';
+import { CompaniesValidator } from '../lib/utils/validator';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 
-// ----------------------------------------------------------------------------
-// common function
-// ----------------------------------------------------------------------------
+const callApi =
+  <Body, T>(url: string) =>
+  (body: Body) =>
+    tryCatch(
+      () => axios.post<T>(url, body),
+      (err) => new Error(String(err))
+    );
 
-const onRejectedWhenMutateCompany = <T,>(reason: T) =>
-  new Error(String(reason));
+const CompanyPage = () => {
+  const { enqueueSnackbar } = useSnackbar();
 
-const onRightWhenMutateCompany = () => mutate('/api/getCompanies');
+  const handleAddCompany = async (company: AddCompany) => {
+    const result = await callApi<AddCompany, CompanyFields>('/api/addCompany')(
+      company
+    )();
+    pipe(
+      result,
+      fold(
+        (err) => {
+          enqueueSnackbar(err.message, { variant: 'error' });
+        },
+        () => {
+          enqueueSnackbar('add ok', { variant: 'success' });
+          mutate('/api/getCompanies');
+        }
+      )
+    );
+  };
 
-const getCompanyHandler = getHandler(onRejectedWhenMutateCompany)(
-  onRightWhenMutateCompany
-);
+  const handleDelAllCompanies = async () => {
+    const result = await callApi<null, { deleted_number: number }>(
+      '/api/delAllCompanies'
+    )(null)();
+    pipe(
+      result,
+      fold(
+        (err) => {
+          enqueueSnackbar(err.message, { variant: 'error' });
+        },
+        (d) => {
+          enqueueSnackbar(
+            `清空 Companies 表(${d.data.deleted_number} 条记录)`,
+            {
+              variant: 'success',
+            }
+          );
+          mutate('/api/getCompanies');
+        }
+      )
+    );
+  };
 
-// ----------------------------------------------------------------------------
-// add company
-// ----------------------------------------------------------------------------
+  return (
+    <Fetchable
+      url="/api/getCompanies"
+      fetcher={getFetcher}
+      validator={CompaniesValidator}
+      loading={() => <Loading />}
+      error={(err) => <Err error={err} />}
+      success={(data) => (
+        <Companies
+          data={data}
+          handleAddCompany={handleAddCompany}
+          handleDelAllCompanies={handleDelAllCompanies}
+        />
+      )}
+    />
+  );
+};
 
-const addCompany =
-  (company: AddCompany): T.Task<AxiosResponse> =>
-  () =>
-    axios.post('/api/addCompany', company);
-
-const onLeftAdd = <E,>(e: E) => console.log(`handleAddCompany error ${e}`);
-
-const handleAddCompany = (company: AddCompany) =>
-  getCompanyHandler(onLeftAdd)(addCompany(company));
-
-// ----------------------------------------------------------------------------
-// delete all companies
-// ----------------------------------------------------------------------------
-
-const delAllCompanies = () => axios.post('/api/delAllCompanies');
-
-const onLeftDelAll = <E,>(e: E) =>
-  console.log(`handleDeleteAllCompanies error ${e}`);
-
-const handlerDelAllCompanies = () =>
-  getCompanyHandler(onLeftDelAll)(delAllCompanies);
-
-// ----------------------------------------------------------------------------
-// query company
-// ----------------------------------------------------------------------------
-
-const ioEitherData =
-  liftSWR<CompanyFields[], string>('/api/getCompanies')(getFetcher);
-
-// ----------------------------------------------------------------------------
-// computation
-// ----------------------------------------------------------------------------
-
-const CompanyPage = pipe(
-  Companies,
-  withSWR(ioEitherData),
-  withHandler('handleAddCompany')(handleAddCompany),
-  withHandler('handleDelAllCompanies')(handlerDelAllCompanies)
-);
-
-export default CompanyPage;
+export default withPageAuthRequired(CompanyPage);
