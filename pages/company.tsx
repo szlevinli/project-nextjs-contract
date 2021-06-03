@@ -11,10 +11,13 @@ import { getFetcher } from '../lib/axios/fetcher';
 import { CompanyFields } from '../lib/sqlite/models';
 import { callApi } from '../lib/utils/helper';
 import { CompaniesValidator } from '../lib/utils/validator';
+import { ApiKeys } from '../lib/utils/const';
 
-const callAddCompanyApi = callApi<AddCompany, CompanyFields>('/api/addCompany');
+const callAddCompanyApi = callApi<AddCompany, CompanyFields>(
+  ApiKeys.COMPANY_CREATE
+);
 const callDelAllCompaniesApi = callApi<unknown, { deleted_number: number }>(
-  '/api/delAllCompanies'
+  ApiKeys.COMPANY_DELETE
 );
 
 const CompanyPage = () => {
@@ -22,12 +25,12 @@ const CompanyPage = () => {
 
   const callApiFailure = (msg: string) => async () => {
     enqueueSnackbar(msg, { variant: 'error' });
-    mutate('/api/getCompanies');
+    mutate(ApiKeys.COMPANY_READ);
   };
 
   const callApiSuccess = (msg: string) => async () => {
     enqueueSnackbar(msg, { variant: 'success' });
-    mutate('/api/getCompanies');
+    mutate(ApiKeys.COMPANY_READ);
   };
 
   const handleAddCompany = (company: AddCompany) =>
@@ -51,7 +54,7 @@ const CompanyPage = () => {
 
   return (
     <Fetchable
-      url="/api/getCompanies"
+      url={ApiKeys.COMPANY_READ}
       fetcher={getFetcher}
       validator={CompaniesValidator}
       loading={() => <Loading />}
