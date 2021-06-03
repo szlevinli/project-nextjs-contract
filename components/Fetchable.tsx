@@ -1,6 +1,6 @@
 import { Type } from 'io-ts';
 import { Fetcher } from 'swr/dist/types';
-import { useFetchJsonWithSwr } from '../lib/utils/fetchJsonWithSWR';
+import { useFetchJsonWithSwr } from '../lib/utils/fetchJsonWithSwr';
 import Remote from './Remote';
 
 export type FetchableProps<T, O, I> = {
