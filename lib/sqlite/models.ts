@@ -49,9 +49,11 @@ const companyTable = createTable<CompanyCreationFields>('Company')({
 
 const nameField = addField<CompanyCreationFields>('name')({
   type: DataTypes.STRING,
+  allowNull: false,
 });
 const abbrField = addField<CompanyCreationFields>('abbr')({
   type: DataTypes.STRING,
+  allowNull: false,
 });
 
 export const Company = pipe({}, nameField, abbrField, companyTable);
