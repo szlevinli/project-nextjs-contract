@@ -33,3 +33,6 @@ const CompanyFields = {
 
 export const CompanyValidator = io.type({ ...CommonFields, ...CompanyFields });
 export const CompaniesValidator = io.array(CompanyValidator);
+
+export const AddCompanyValidator = io.type(CompanyFields);
+export const AddCompaniesValidator = io.array(AddCompanyValidator);
