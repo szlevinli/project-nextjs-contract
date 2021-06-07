@@ -1,34 +1,34 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Project with Next.js
 
-## Getting Started
+## Fetch Data from Remote
 
-First, run the development server:
+### Lift `useSWR` to `Either`
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+文件路径: <projectRoot>/lib/utils/fetchJsonWithSwr.ts
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+目的:
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+- 将执行 `useSWR` 后的结果封装到 `Either` 中
+- 使用 `io-ts`, `io-ts-reporters` 包对服务器返回的数据进行 **运行时** 静态类型检测
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+> 注意: 在 `Either` 的 `left` 中实际包含两种应用程序状态, 一个是执行 `useSWR` 时发生的错误, 一个是正在 loading 状态. 这要求在进行 `onLeft` 操作时需要对回调函数中传入的参数进行判断, i.e. `(e) => (isNil(e) ? loading() : error(e))`
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### 分析远程返回的数据 (已被封装到 `Either`)
 
-## Learn More
+文件路径: <projectRoot>/components/Remote.tsx
 
-To learn more about Next.js, take a look at the following resources:
+目的:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 分析从远程服务器返回的被封装到 `Either` 中的数据
+- 发生错误则调用错误界面
+- 加载状态下调用加载界面
+- 成功读取到数据则调用使用该数据去显示的界面
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### 组装上面两个功能
 
-## Deploy on Vercel
+文件路径: <projectRoot>/components/Fetchable.tsx
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+目的:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- 调用 `useFetchJsonWithSwr`
+- 调用 `Remote` 组件
