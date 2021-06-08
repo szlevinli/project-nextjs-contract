@@ -1,6 +1,6 @@
 import { isLeft, isRight, left, map, right } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
-import { maxLength, minLength, sequenceValidation } from './validations';
+import { maxLength, minLength, sequenceValidationT } from './validations';
 
 it('should be return legal data', () => {
   const data = 'hello';
@@ -9,7 +9,7 @@ it('should be return legal data', () => {
   const maxLenIsSix = maxLength(6)(data);
 
   const validatedResult = pipe(
-    sequenceValidation(minLenIsTwo, maxLenIsSix),
+    sequenceValidationT(minLenIsTwo, maxLenIsSix),
     map(() => data)
   );
 
@@ -24,7 +24,7 @@ it('should be return failure message when min validation is triggered', () => {
   const maxLenIsSix = maxLength(6)(data);
 
   const validatedResult = pipe(
-    sequenceValidation(minLenIsTwo, maxLenIsSix),
+    sequenceValidationT(minLenIsTwo, maxLenIsSix),
     map(() => data)
   );
 
@@ -39,7 +39,7 @@ it('should be return failure message when max validation is triggered', () => {
   const maxLenIsSix = maxLength(6)(data);
 
   const validatedResult = pipe(
-    sequenceValidation(minLenIsTwo, maxLenIsSix),
+    sequenceValidationT(minLenIsTwo, maxLenIsSix),
     map(() => data)
   );
 
