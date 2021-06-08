@@ -9,8 +9,8 @@ import reporter from 'io-ts-reporters';
 import { NextApiHandler } from 'next';
 import { join, zipObj } from 'ramda';
 import { Company, CompanyCreationFields } from '../../lib/sqlite/models';
-import { maxLength, minLength } from '../../lib/utils/validations';
-import { AddCompanyValidator } from '../../lib/utils/validator';
+import { maxLength, minLength } from '../../lib/validations/validations';
+import { AddCompanyValidator } from '../../lib/validations/validator';
 
 const minLenFourOfName = minLength(4);
 const maxLenThirtyOfName = maxLength(30);

@@ -10,7 +10,7 @@ import Loading from '../components/Loading';
 import { getFetcher } from '../lib/axios/fetcher';
 import { CompanyFields } from '../lib/sqlite/models';
 import { callApi } from '../lib/utils/helper';
-import { CompaniesValidator } from '../lib/utils/validator';
+import { CompaniesValidator } from '../lib/validations/validator';
 import { ApiKeys } from '../lib/utils/const';
 
 const callAddCompanyApi = callApi<AddCompany, CompanyFields>(
