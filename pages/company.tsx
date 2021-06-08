@@ -3,17 +3,17 @@ import { pipe } from 'fp-ts/lib/function';
 import { fold } from 'fp-ts/TaskEither';
 import { useSnackbar } from 'notistack';
 import { mutate } from 'swr';
-import Companies, { AddCompany } from '../components/Companies';
+import Companies from '../components/Companies';
 import Err from '../components/Err';
 import Fetchable from '../components/Fetchable';
 import Loading from '../components/Loading';
 import { getFetcher } from '../lib/axios/fetcher';
-import { CompanyFields } from '../lib/sqlite/models';
+import { CompanyFields, CompanyCreationFields } from '../lib/sqlite/models';
 import { callAPI } from '../lib/utils/callAPI';
 import { CompaniesValidator } from '../lib/validations/validator';
 import { ApiKeys } from '../lib/utils/const';
 
-const callAddCompanyApi = callAPI<AddCompany, CompanyFields>(
+const callAddCompanyApi = callAPI<CompanyCreationFields, CompanyFields>(
   ApiKeys.COMPANY_CREATE
 );
 const callDelAllCompaniesApi = callAPI<unknown, { deleted_number: number }>(
@@ -33,7 +33,7 @@ const CompanyPage = () => {
     mutate(ApiKeys.COMPANY_READ);
   };
 
-  const handleAddCompany = (company: AddCompany) =>
+  const handleAddCompany = (company: CompanyCreationFields) =>
     pipe(
       callAddCompanyApi(company),
       fold(
