@@ -1,49 +1,14 @@
 import { withApiAuthRequired } from '@auth0/nextjs-auth0';
-import { sequenceT } from 'fp-ts/Apply';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
-import { getSemigroup } from 'fp-ts/NonEmptyArray';
 import * as TE from 'fp-ts/TaskEither';
 import { Validation } from 'io-ts';
 import reporter from 'io-ts-reporters';
 import { NextApiHandler } from 'next';
-import { join, zipObj } from 'ramda';
+import { join } from 'ramda';
 import { Company, CompanyCreationFields } from '../../lib/sqlite/models';
-import { maxLength, minLength } from '../../lib/validations/validations';
+import { validateCompany } from '../../lib/validations/companyValidation';
 import { AddCompanyValidator } from '../../lib/validations/validator';
-
-const minLenFourOfName = minLength(4);
-const maxLenThirtyOfName = maxLength(30);
-const minLenTwoOfAbbr = minLength(2);
-const maxLenSixOfName = maxLength(6);
-
-const sequenceValidate = sequenceT(
-  E.getApplicativeValidation(getSemigroup<string>())
-);
-
-const validateName = (name: string) =>
-  pipe(
-    sequenceValidate(minLenFourOfName(name), maxLenThirtyOfName(name)),
-    E.map(() => name)
-  );
-
-const validateAbbr = (abbr: string) =>
-  pipe(
-    sequenceValidate(minLenTwoOfAbbr(abbr), maxLenSixOfName(abbr)),
-    E.map(() => abbr)
-  );
-
-const validateCompany = (
-  company: CompanyCreationFields
-): E.Either<Error, CompanyCreationFields> =>
-  pipe(
-    // Either<NonEmptyArray<string>, string[]>
-    sequenceValidate(validateName(company.name), validateAbbr(company.abbr)),
-    // Either<Error, string[]>
-    E.mapLeft((e) => new Error(e.join('\n'))),
-    // Either<Error, CompanyCreationFields>
-    E.map(zipObj<keyof CompanyCreationFields>(['name', 'abbr']))
-  );
 
 const createCompany = (company: CompanyCreationFields) =>
   TE.tryCatch(
