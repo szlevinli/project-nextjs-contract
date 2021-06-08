@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { tryCatch, chain, fromPredicate } from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/function';
 
-export const callApi =
+export const callAPI =
   <Body, T>(url: string) =>
   (body?: Body) =>
     pipe(

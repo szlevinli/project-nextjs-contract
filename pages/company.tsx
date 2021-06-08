@@ -9,14 +9,14 @@ import Fetchable from '../components/Fetchable';
 import Loading from '../components/Loading';
 import { getFetcher } from '../lib/axios/fetcher';
 import { CompanyFields } from '../lib/sqlite/models';
-import { callApi } from '../lib/utils/helper';
+import { callAPI } from '../lib/utils/callAPI';
 import { CompaniesValidator } from '../lib/validations/validator';
 import { ApiKeys } from '../lib/utils/const';
 
-const callAddCompanyApi = callApi<AddCompany, CompanyFields>(
+const callAddCompanyApi = callAPI<AddCompany, CompanyFields>(
   ApiKeys.COMPANY_CREATE
 );
-const callDelAllCompaniesApi = callApi<unknown, { deleted_number: number }>(
+const callDelAllCompaniesApi = callAPI<unknown, { deleted_number: number }>(
   ApiKeys.COMPANY_DELETE
 );
 
