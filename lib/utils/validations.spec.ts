@@ -1,44 +1,48 @@
-import { validateText, minLength, oneNumber } from './validations';
-import { fold } from 'fp-ts/Either';
+import { isLeft, isRight, left, map, right } from 'fp-ts/Either';
+import { pipe } from 'fp-ts/function';
+import { maxLength, minLength, sequenceValidation } from './validations';
 
-it('应该返回两个错误信息', () => {
-  const str = 'ab';
-  const minSixLength = minLength(6)(str);
-  const oneNumber_ = oneNumber(str);
-  const result = validateText([minSixLength, oneNumber_])(str);
+it('should be return legal data', () => {
+  const data = 'hello';
 
-  const value = fold(
-    (e) => e,
-    (a) => a
-  )(result);
+  const minLenIsTwo = minLength(2)(data);
+  const maxLenIsSix = maxLength(6)(data);
 
-  expect(value).toHaveLength(2);
+  const validatedResult = pipe(
+    sequenceValidation(minLenIsTwo, maxLenIsSix),
+    map(() => data)
+  );
+
+  expect(isRight(validatedResult)).toBeTruthy();
+  expect(validatedResult).toEqual(right(data));
 });
 
-it('应该返回一个错误信息', () => {
-  const str = 'abcdef';
-  const minSixLength = minLength(6)(str);
-  const oneNumber_ = oneNumber(str);
-  const result = validateText([minSixLength, oneNumber_])(str);
+it('should be return failure message when min validation is triggered', () => {
+  const data = 'h';
 
-  const value = fold(
-    (e) => e,
-    (a) => a
-  )(result);
+  const minLenIsTwo = minLength(2)(data);
+  const maxLenIsSix = maxLength(6)(data);
 
-  expect(value).toHaveLength(1);
+  const validatedResult = pipe(
+    sequenceValidation(minLenIsTwo, maxLenIsSix),
+    map(() => data)
+  );
+
+  expect(isLeft(validatedResult)).toBeTruthy();
+  expect(validatedResult).toEqual(left(['最少 2 个字符']));
 });
 
-it('应该返回输入的值, 即满足所有验证', () => {
-  const str = 'abcd2ef';
-  const minSixLength = minLength(6)(str);
-  const oneNumber_ = oneNumber(str);
-  const result = validateText([minSixLength, oneNumber_])(str);
+it('should be return failure message when max validation is triggered', () => {
+  const data = 'hello world';
 
-  const value = fold(
-    (e) => e,
-    (a) => a
-  )(result);
+  const minLenIsTwo = minLength(2)(data);
+  const maxLenIsSix = maxLength(6)(data);
 
-  expect(value).toBe(str);
+  const validatedResult = pipe(
+    sequenceValidation(minLenIsTwo, maxLenIsSix),
+    map(() => data)
+  );
+
+  expect(isLeft(validatedResult)).toBeTruthy();
+  expect(validatedResult).toEqual(left(['最多 6 个字符']));
 });
