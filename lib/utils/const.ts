@@ -12,3 +12,9 @@ export const ApiKeys = {
   COMPANY_UPDATE: ``,
   COMPANY_DELETE: `${PREFIX}/delAllCompanies`,
 };
+
+export enum ACTION {
+  CREATE,
+  MODIFY,
+  DELETE,
+}

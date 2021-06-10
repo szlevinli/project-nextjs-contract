@@ -1,12 +1,12 @@
 import { Either, map, mapLeft } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
-import { zipObj } from 'ramda';
 import { CompanyCreationFields } from '../sqlite/models';
 import {
   maxLength,
   minLength,
-  sequenceValidationT,
   sequenceValidationS,
+  sequenceValidationT,
+  validateInputText,
 } from './validations';
 
 const minLenFourOfName = minLength(4);
@@ -17,12 +17,14 @@ const maxLenSixOfName = maxLength(6);
 export const validateName = (name: string) =>
   pipe(
     sequenceValidationT(minLenFourOfName(name), maxLenThirtyOfName(name)),
+    mapLeft((e) => e.join('\n')),
     map(() => name)
   );
 
 export const validateAbbr = (abbr: string) =>
   pipe(
     sequenceValidationT(minLenTwoOfAbbr(abbr), maxLenSixOfName(abbr)),
+    mapLeft((e) => e.join('\n')),
     map(() => abbr)
   );
 
@@ -36,5 +38,5 @@ export const validateCompany = (
       abbr: validateAbbr(company.abbr),
     }),
     // Either<Error, string[]>
-    mapLeft((e) => new Error(e.join('\n')))
+    mapLeft((e) => new Error(e))
   );

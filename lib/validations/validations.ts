@@ -4,10 +4,12 @@ import {
   right,
   getApplicativeValidation,
   Apply,
+  fold,
 } from 'fp-ts/Either';
 import { NonEmptyArray } from 'fp-ts/NonEmptyArray';
 import { getSemigroup } from 'fp-ts/NonEmptyArray';
 import { sequenceT, sequenceS } from 'fp-ts/Apply';
+import { pipe } from 'fp-ts/function';
 
 export const minLength =
   (min: number) =>
@@ -24,3 +26,9 @@ export const sequenceValidationT = sequenceT(
 );
 
 export const sequenceValidationS = sequenceS(Apply);
+
+export const validateInputText =
+  <E>(validatedResult: Either<E, string>) =>
+  (onLeft: (e: E) => void) =>
+  (onRight: () => void) =>
+    pipe(validatedResult, fold(onLeft, onRight));
