@@ -1,6 +1,6 @@
 import { useUser } from '@auth0/nextjs-auth0';
 import { GetStaticProps } from 'next';
-import db from '../lib/sqlite/db';
+import { db } from '../lib/sqlite/models';
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
