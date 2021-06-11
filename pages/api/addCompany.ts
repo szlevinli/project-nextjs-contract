@@ -6,11 +6,11 @@ import { Validation } from 'io-ts';
 import reporter from 'io-ts-reporters';
 import { NextApiHandler } from 'next';
 import { join } from 'ramda';
-import { Company, CompanyCreationFields } from '../../lib/sqlite/models';
+import { Company, CompanyCreateFields } from '../../lib/sqlite/models';
 import { validateCompany } from '../../lib/validations/companyValidation';
 import { AddCompanyValidator } from '../../lib/validations/validator';
 
-const createCompany = (company: CompanyCreationFields) =>
+const createCompany = (company: CompanyCreateFields) =>
   TE.tryCatch(
     () => Company.create(company),
     (reason) => new Error(String(reason))
@@ -20,7 +20,7 @@ const handler: NextApiHandler = async (req, res) => {
   // 验证请求新增的 company 是否满足静态类型 `CompanyCreationFields` 要求
   // 这里使用 `io-ts` 进行静态类型验证
   // Validation<CompanyCreationFields> 实际上等同于 Either<Errors, CompanyCreationFields>
-  const validatedResult: Validation<CompanyCreationFields> =
+  const validatedResult: Validation<CompanyCreateFields> =
     AddCompanyValidator.decode(req.body);
 
   // 以下代码通过 `fp-ts/TaskEither` 实现如下的目标:

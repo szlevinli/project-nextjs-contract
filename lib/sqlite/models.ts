@@ -26,32 +26,49 @@ const addField =
 // Common
 //
 
-export type CommonFields = {
+export interface PkFields {
   id: number;
+}
+
+export interface CommonFields extends PkFields {
   createdAt: Date;
   updatedAt: Date;
-};
+}
+
+export type AllFields<T> = CommonFields & T;
+
+export type CreateFields<T> = T;
+
+export type UpdateFields<T> = PkFields & T;
+
+export type DeleteFields = PkFields;
 
 //
 // Model: Company
 //
 
-export type CompanyCreationFields = {
+export type CompanyFields = {
   name: string;
   abbr: string;
 };
 
-export type CompanyFields = CommonFields & CompanyCreationFields;
+export type CompanyCreateFields = CreateFields<CompanyFields>;
 
-const companyTable = createTable<CompanyCreationFields>('Company')({
+export type CompanyAllFields = AllFields<CompanyFields>;
+
+export type CompanyUpdateFields = UpdateFields<CompanyFields>;
+
+export type CompanyDeleteFields = DeleteFields;
+
+const companyTable = createTable<CompanyCreateFields>('Company')({
   modelName: 'Companies',
 });
 
-const nameField = addField<CompanyCreationFields>('name')({
+const nameField = addField<CompanyCreateFields>('name')({
   type: DataTypes.STRING,
   allowNull: false,
 });
-const abbrField = addField<CompanyCreationFields>('abbr')({
+const abbrField = addField<CompanyCreateFields>('abbr')({
   type: DataTypes.STRING,
   allowNull: false,
 });

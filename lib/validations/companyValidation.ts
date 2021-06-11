@@ -1,12 +1,11 @@
 import { Either, map, mapLeft } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
-import { CompanyCreationFields } from '../sqlite/models';
+import { CompanyCreateFields } from '../sqlite/models';
 import {
   maxLength,
   minLength,
   sequenceValidationS,
   sequenceValidationT,
-  validateInputText,
 } from './validations';
 
 const minLenFourOfName = minLength(4);
@@ -29,8 +28,8 @@ export const validateAbbr = (abbr: string) =>
   );
 
 export const validateCompany = (
-  company: CompanyCreationFields
-): Either<Error, CompanyCreationFields> =>
+  company: CompanyCreateFields
+): Either<Error, CompanyCreateFields> =>
   pipe(
     // Either<NonEmptyArray<string>, CompanyCreationFields>
     sequenceValidationS({

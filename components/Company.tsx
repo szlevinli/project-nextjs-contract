@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { MouseEventHandler, useState } from 'react';
-import { CompanyCreationFields, CompanyFields } from '../lib/sqlite/models';
+import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
 import { ACTION } from '../lib/utils/const';
 import {
   validateAbbr,
@@ -18,8 +18,8 @@ import InputText from './InputText';
 export type FormDialogProp = {
   open: boolean;
   handleClose: () => void;
-  handleSubmit: (args?: CompanyCreationFields) => void;
-  data?: CompanyFields;
+  handleSubmit: (args?: CompanyCreateFields) => void;
+  data?: CompanyAllFields;
   action?: ACTION;
 };
 
@@ -43,9 +43,9 @@ export const FormDialog = ({
 );
 
 export type CompanyProps = {
-  data?: CompanyFields;
+  data?: CompanyAllFields;
   action?: ACTION;
-  handleSubmit: (company: CompanyCreationFields) => unknown;
+  handleSubmit: (company: CompanyCreateFields) => unknown;
 };
 
 const Company = ({

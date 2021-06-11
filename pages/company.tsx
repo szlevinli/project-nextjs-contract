@@ -8,12 +8,12 @@ import Err from '../components/Err';
 import Fetchable from '../components/Fetchable';
 import Loading from '../components/Loading';
 import { getFetcher } from '../lib/axios/fetcher';
-import { CompanyFields, CompanyCreationFields } from '../lib/sqlite/models';
+import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
 import { callAPI } from '../lib/utils/callAPI';
-import { CompaniesValidator } from '../lib/validations/validator';
 import { ApiKeys } from '../lib/utils/const';
+import { CompaniesValidator } from '../lib/validations/validator';
 
-const callAddCompanyApi = callAPI<CompanyCreationFields, CompanyFields>(
+const callAddCompanyApi = callAPI<CompanyCreateFields, CompanyAllFields>(
   ApiKeys.COMPANY_CREATE
 );
 const callDelAllCompaniesApi = callAPI<unknown, { deleted_number: number }>(
@@ -33,7 +33,7 @@ const CompanyPage = () => {
     mutate(ApiKeys.COMPANY_READ);
   };
 
-  const handleAddCompany = (company: CompanyCreationFields) =>
+  const handleAddCompany = (company: CompanyCreateFields) =>
     pipe(
       callAddCompanyApi(company),
       fold(

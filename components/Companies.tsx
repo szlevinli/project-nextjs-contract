@@ -2,12 +2,12 @@ import { Button } from '@material-ui/core';
 import { find, propEq } from 'ramda';
 import React from 'react';
 import { FormDialog } from '../components/Company';
-import { CompanyCreationFields, CompanyFields } from '../lib/sqlite/models';
+import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
 import { ACTION } from '../lib/utils/const';
 
 export type CompaniesProps = {
-  data: CompanyFields[];
-  handleAddCompany: (company: CompanyCreationFields) => Promise<any>;
+  data: CompanyAllFields[];
+  handleAddCompany: (company: CompanyCreateFields) => Promise<any>;
   handleDelAllCompanies: () => Promise<unknown>;
 };
 
@@ -18,7 +18,7 @@ const Companies: React.FC<CompaniesProps> = ({
 }) => {
   const [open, setOpen] = React.useState(false);
   const [selectedCompany, setSelectedCompany] =
-    React.useState<null | CompanyFields>(null);
+    React.useState<null | CompanyAllFields>(null);
   const [handleSubmit, setHandleSubmit] = React.useState(() => () => {
     console.log(`handle ok`);
   });
@@ -29,9 +29,9 @@ const Companies: React.FC<CompaniesProps> = ({
   };
 
   const modify = (id: number) => {
-    const value = find<CompanyFields>(propEq('id', id))(data);
+    const value = find<CompanyAllFields>(propEq('id', id))(data);
     setSelectedCompany(value);
-    setHandleSubmit(() => (company: CompanyCreationFields) => {
+    setHandleSubmit(() => (company: CompanyCreateFields) => {
       console.log(`modify company: ${JSON.stringify(company)}`);
     });
     setAction(ACTION.MODIFY);
