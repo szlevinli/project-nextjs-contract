@@ -5,14 +5,19 @@ import {
   ModelAttributeColumnOptions,
   ModelAttributes,
   ModelOptions,
+  Sequelize,
 } from 'sequelize';
-import db from './db';
+
+export const db = new Sequelize({
+  dialect: 'sqlite',
+  storage: 'data/db.sqlite',
+});
 
 const createTable =
   <T>(tableName: string) =>
   (tableOptions: ModelOptions<Model<T>>) =>
   (fields: ModelAttributes<Model<T>>) =>
-    db.define<Model<T>>(tableName, fields, tableOptions);
+    db.define<Model<T>>(tableName, fields, { paranoid: true, ...tableOptions });
 
 const addField =
   <T>(fieldName: keyof T) =>
@@ -33,6 +38,7 @@ export interface PkFields {
 export interface CommonFields extends PkFields {
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date;
 }
 
 export type AllFields<T> = CommonFields & T;
