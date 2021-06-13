@@ -8,7 +8,11 @@ import Err from '../components/Err';
 import Fetchable from '../components/Fetchable';
 import Loading from '../components/Loading';
 import { getFetcher } from '../lib/axios/fetcher';
-import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
+import {
+  CompanyAllFields,
+  CompanyCreateFields,
+  CompanyUpdateFields,
+} from '../lib/sqlite/models';
 import { callAPI } from '../lib/utils/callAPI';
 import { ApiKeys } from '../lib/utils/const';
 import { CompaniesValidator } from '../lib/validations/validator';
@@ -16,6 +20,11 @@ import { CompaniesValidator } from '../lib/validations/validator';
 const callAddCompanyApi = callAPI<CompanyCreateFields, CompanyAllFields>(
   ApiKeys.COMPANY_CREATE
 );
+
+const callUpdateCompanyApi = callAPI<CompanyUpdateFields, number>(
+  ApiKeys.COMPANY_UPDATE
+);
+
 const callDelAllCompaniesApi = callAPI<unknown, { deleted_number: number }>(
   ApiKeys.COMPANY_DELETE
 );
@@ -42,6 +51,15 @@ const CompanyPage = () => {
       )
     )();
 
+  const handleUpdateCompany = (updateCompany: CompanyUpdateFields) =>
+    pipe(
+      callUpdateCompanyApi(updateCompany),
+      fold(
+        (e) => callApiFailure(e.message),
+        (d) => callApiSuccess(`成功更新 ${d.data} 记录`)
+      )
+    )();
+
   const handleDelAllCompanies = () =>
     pipe(
       callDelAllCompaniesApi(),
@@ -63,6 +81,7 @@ const CompanyPage = () => {
         <Companies
           data={data}
           handleAddCompany={handleAddCompany}
+          handleUpdateCompany={handleUpdateCompany}
           handleDelAllCompanies={handleDelAllCompanies}
         />
       )}
