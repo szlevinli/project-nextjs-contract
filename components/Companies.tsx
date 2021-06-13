@@ -2,18 +2,24 @@ import { Button } from '@material-ui/core';
 import { find, propEq } from 'ramda';
 import React from 'react';
 import { FormDialog } from '../components/Company';
-import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
+import {
+  CompanyAllFields,
+  CompanyCreateFields,
+  CompanyUpdateFields,
+} from '../lib/sqlite/models';
 import { ACTION } from '../lib/utils/const';
 
 export type CompaniesProps = {
   data: CompanyAllFields[];
   handleAddCompany: (company: CompanyCreateFields) => Promise<any>;
+  handleUpdateCompany: (updateCompany: CompanyUpdateFields) => Promise<any>;
   handleDelAllCompanies: () => Promise<unknown>;
 };
 
 const Companies: React.FC<CompaniesProps> = ({
   data,
   handleAddCompany,
+  handleUpdateCompany,
   handleDelAllCompanies,
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -31,9 +37,7 @@ const Companies: React.FC<CompaniesProps> = ({
   const modify = (id: number) => {
     const value = find<CompanyAllFields>(propEq('id', id))(data);
     setSelectedCompany(value);
-    setHandleSubmit(() => (company: CompanyCreateFields) => {
-      console.log(`modify company: ${JSON.stringify(company)}`);
-    });
+    setHandleSubmit(() => handleUpdateCompany);
     setAction(ACTION.MODIFY);
     setOpen(true);
   };

@@ -7,7 +7,11 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { MouseEventHandler, useState } from 'react';
-import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
+import {
+  CompanyAllFields,
+  CompanyCreateFields,
+  CompanyUpdateFields,
+} from '../lib/sqlite/models';
 import { ACTION } from '../lib/utils/const';
 import {
   validateAbbr,
@@ -45,7 +49,7 @@ export const FormDialog = ({
 export type CompanyProps = {
   data?: CompanyAllFields;
   action?: ACTION;
-  handleSubmit: (company: CompanyCreateFields) => unknown;
+  handleSubmit: (company: CompanyCreateFields | CompanyUpdateFields) => unknown;
 };
 
 const Company = ({
@@ -62,10 +66,15 @@ const Company = ({
   const [abbrTouched, setAbbrTouched] = useState(false);
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
-    handleSubmit({
-      name,
-      abbr,
-    });
+    handleSubmit(
+      Object.assign(
+        {
+          name,
+          abbr,
+        },
+        action !== ACTION.CREATE ? { id: data.id } : {}
+      )
+    );
   };
 
   const isLegal = () => !nameError && !abbrError;
