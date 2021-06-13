@@ -9,7 +9,7 @@ export const ApiKeys = {
 
   COMPANY_CREATE: `${PREFIX}/addCompany`,
   COMPANY_READ: `${PREFIX}/getCompanies`,
-  COMPANY_UPDATE: ``,
+  COMPANY_UPDATE: `${PREFIX}/updateCompany`,
   COMPANY_DELETE: `${PREFIX}/delAllCompanies`,
 };
 
