@@ -14,10 +14,13 @@ export const db = new Sequelize({
 });
 
 const createTable =
-  <T>(tableName: string) =>
-  (tableOptions: ModelOptions<Model<T>>) =>
-  (fields: ModelAttributes<Model<T>>) =>
-    db.define<Model<T>>(tableName, fields, { paranoid: true, ...tableOptions });
+  <T, C>(tableName: string) =>
+  (tableOptions: ModelOptions<Model<T, C>>) =>
+  (fields: ModelAttributes<Model<T, C>>) =>
+    db.define<Model<T, C>>(tableName, fields, {
+      paranoid: true,
+      ...tableOptions,
+    });
 
 const addField =
   <T>(fieldName: keyof T) =>
@@ -66,7 +69,9 @@ export type CompanyUpdateFields = UpdateFields<CompanyFields>;
 
 export type CompanyDeleteFields = DeleteFields;
 
-const companyTable = createTable<CompanyCreateFields>('Company')({
+const companyTable = createTable<CompanyAllFields, CompanyCreateFields>(
+  'Company'
+)({
   modelName: 'Companies',
 });
 
