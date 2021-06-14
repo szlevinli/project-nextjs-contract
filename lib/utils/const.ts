@@ -10,7 +10,8 @@ export const ApiKeys = {
   COMPANY_CREATE: `${PREFIX}/addCompany`,
   COMPANY_READ: `${PREFIX}/getCompanies`,
   COMPANY_UPDATE: `${PREFIX}/updateCompany`,
-  COMPANY_DELETE: `${PREFIX}/delAllCompanies`,
+  COMPANY_DELETE: `${PREFIX}/delCompany`,
+  COMPANY_DELETE_ALL: `${PREFIX}/delAllCompanies`,
 };
 
 export enum ACTION {

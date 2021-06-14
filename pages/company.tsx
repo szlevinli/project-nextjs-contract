@@ -12,6 +12,7 @@ import {
   CompanyAllFields,
   CompanyCreateFields,
   CompanyUpdateFields,
+  CompanyDeleteFields,
 } from '../lib/sqlite/models';
 import { callAPI } from '../lib/utils/callAPI';
 import { ApiKeys } from '../lib/utils/const';
@@ -25,8 +26,12 @@ const callUpdateCompanyApi = callAPI<CompanyUpdateFields, number>(
   ApiKeys.COMPANY_UPDATE
 );
 
-const callDelAllCompaniesApi = callAPI<unknown, { deleted_number: number }>(
+const callDeleteCompanyApi = callAPI<CompanyDeleteFields, number>(
   ApiKeys.COMPANY_DELETE
+);
+
+const callDelAllCompaniesApi = callAPI<unknown, { deleted_number: number }>(
+  ApiKeys.COMPANY_DELETE_ALL
 );
 
 const CompanyPage = () => {
@@ -60,6 +65,15 @@ const CompanyPage = () => {
       )
     )();
 
+  const handleDeleteCompany = (deleteCompany: CompanyDeleteFields) =>
+    pipe(
+      callDeleteCompanyApi(deleteCompany),
+      fold(
+        (e) => callApiFailure(e.message),
+        (d) => callApiSuccess(`成功删除 ${d.data} 记录`)
+      )
+    )();
+
   const handleDelAllCompanies = () =>
     pipe(
       callDelAllCompaniesApi(),
@@ -82,6 +96,7 @@ const CompanyPage = () => {
           data={data}
           handleAddCompany={handleAddCompany}
           handleUpdateCompany={handleUpdateCompany}
+          handleDeleteCompany={handleDeleteCompany}
           handleDelAllCompanies={handleDelAllCompanies}
         />
       )}

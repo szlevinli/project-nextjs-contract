@@ -6,6 +6,7 @@ import {
   CompanyAllFields,
   CompanyCreateFields,
   CompanyUpdateFields,
+  CompanyDeleteFields,
 } from '../lib/sqlite/models';
 import { ACTION } from '../lib/utils/const';
 
@@ -13,6 +14,7 @@ export type CompaniesProps = {
   data: CompanyAllFields[];
   handleAddCompany: (company: CompanyCreateFields) => Promise<any>;
   handleUpdateCompany: (updateCompany: CompanyUpdateFields) => Promise<any>;
+  handleDeleteCompany: (deleteCompany: CompanyDeleteFields) => Promise<any>;
   handleDelAllCompanies: () => Promise<unknown>;
 };
 
@@ -20,6 +22,7 @@ const Companies: React.FC<CompaniesProps> = ({
   data,
   handleAddCompany,
   handleUpdateCompany,
+  handleDeleteCompany,
   handleDelAllCompanies,
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -34,18 +37,18 @@ const Companies: React.FC<CompaniesProps> = ({
     setOpen(false);
   };
 
+  const create = () => {
+    setSelectedCompany(null);
+    setHandleSubmit(() => handleAddCompany);
+    setAction(ACTION.CREATE);
+    setOpen(true);
+  };
+
   const modify = (id: number) => {
     const value = find<CompanyAllFields>(propEq('id', id))(data);
     setSelectedCompany(value);
     setHandleSubmit(() => handleUpdateCompany);
     setAction(ACTION.MODIFY);
-    setOpen(true);
-  };
-
-  const create = () => {
-    setSelectedCompany(null);
-    setHandleSubmit(() => handleAddCompany);
-    setAction(ACTION.CREATE);
     setOpen(true);
   };
 
@@ -63,6 +66,9 @@ const Companies: React.FC<CompaniesProps> = ({
           <li key={v.id}>
             {v.id}: {JSON.stringify(v)}
             <Button onClick={() => modify(v.id)}>Modify</Button>
+            <Button onClick={() => handleDeleteCompany({ id: v.id })}>
+              Delete
+            </Button>
           </li>
         ))}
       </ul>
