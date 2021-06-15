@@ -2,7 +2,6 @@ import { withApiAuthRequired } from '@auth0/nextjs-auth0';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import * as TE from 'fp-ts/TaskEither';
-import { Validation } from 'io-ts';
 import { formatValidationErrors } from 'io-ts-reporters';
 import { NextApiHandler } from 'next';
 import { join } from 'ramda';
@@ -16,19 +15,20 @@ const createCompany = (company: CompanyCreateFields) =>
     (reason) => new Error(String(reason))
   );
 
-const handler: NextApiHandler = async (req, res) => {
-  // 验证请求新增的 company 是否满足静态类型 `CompanyCreationFields` 要求
-  // 这里使用 `io-ts` 进行静态类型验证
-  // Validation<CompanyCreationFields> 实际上等同于 Either<Errors, CompanyCreationFields>
-  const validatedResult: Validation<CompanyCreateFields> =
-    CreateCompanyValidator.decode(req.body);
-
+const createCompanyHandler: NextApiHandler = async (req, res) => {
   // 以下代码通过 `fp-ts/TaskEither` 实现如下的目标:
-  //   - 如果客户端传递过来的数据通过静态类型验证, 则调用创建 company api
-  //   - 否则跳过调用创建 company api (这得益于 `fp-ts/TaskEither`)
-  const task = pipe(
+  //   - 对客户端数据进行类型验证
+  //   - 对客户端数据进行数值验证
+  //   - 创建记录
+  //   - 将执行结果返回给客户端
+  //     - 上面的步骤发生错误则使用状态码 290 加错误信息返回
+  //     - 否则(无异常情况)使用状态码 200 返回执行结果
+  await pipe(
+    // 验证请求新增的 company 是否满足静态类型 `CompanyCreationFields` 要求
+    // 这里使用 `io-ts` 进行静态类型验证
+    // Validation<CompanyCreationFields> 实际上等同于 Either<Errors, CompanyCreationFields>
     // Either<Errors, CompanyCreationFields>
-    validatedResult,
+    CreateCompanyValidator.decode(req.body),
 
     // Either<Error, CompanyCreationFields>
     // 将 Errors 转换成 Error 便于后续 composition
@@ -41,20 +41,14 @@ const handler: NextApiHandler = async (req, res) => {
     TE.fromEither,
 
     // compose
-    TE.chain((company) => createCompany(company))
-  );
+    TE.chain((company) => createCompany(company)),
 
-  // 执行 TaskEither. 返回 Either
-  const result = await task();
-
-  // 结构上面的执行结果
-  pipe(
-    result,
-    E.fold(
-      (e) => res.status(290).json(String(e)),
-      (d) => res.status(200).json(d.toJSON())
+    // destructor
+    TE.fold(
+      (e) => async () => res.status(290).json(String(e)),
+      (d) => async () => res.status(200).json(d.toJSON())
     )
-  );
+  )();
 };
 
-export default withApiAuthRequired(handler);
+export default withApiAuthRequired(createCompanyHandler);
