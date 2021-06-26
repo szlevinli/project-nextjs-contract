@@ -1,24 +1,13 @@
 import * as io from 'io-ts';
 import * as t from 'io-ts-types';
+import { DestroyOptions } from 'sequelize';
 import {
-  PkFields,
   CommonFields,
+  CompanyAllFields,
   CompanyCreateFields,
   CompanyUpdateFields,
-  CompanyDeleteFields,
-  CompanyAllFields,
+  PkFields,
 } from '../sqlite/models';
-
-export const ActivityValidator = io.type({
-  startTime: io.string,
-  title: io.string,
-  minuteCount: io.number,
-});
-
-export const ActivityArrayValidator = io.array(ActivityValidator);
-
-export type Activity = io.TypeOf<typeof ActivityValidator>;
-export type ActivityArray = io.TypeOf<typeof ActivityArrayValidator>;
 
 //
 // Helper For Type Define
@@ -54,6 +43,15 @@ const CompanyCreateFields_: ObjectWithSpecifiedKeys<CompanyCreateFields> = {
 export const CreateCompanyValidator = io.type(CompanyCreateFields_);
 export const CreateCompaniesValidator = io.array(CreateCompanyValidator);
 
+// All
+const CompanyAllFields_: ObjectWithSpecifiedKeys<CompanyAllFields> = {
+  ...CommonFields_,
+  ...CompanyCreateFields_,
+};
+
+export const CompanyValidator = io.type(CompanyAllFields_);
+export const CompaniesValidator = io.array(CompanyValidator);
+
 // Update
 const CompanyUpdateFields_: ObjectWithSpecifiedKeys<CompanyUpdateFields> = {
   ...PkFields_,
@@ -64,18 +62,11 @@ export const UpdateCompanyValidator = io.type(CompanyUpdateFields_);
 export const UpdateCompaniesValidator = io.array(UpdateCompanyValidator);
 
 // Delete
-const CompanyDeleteFields_: ObjectWithSpecifiedKeys<CompanyDeleteFields> = {
-  ...PkFields_,
+const CompanyDestroyOptions: ObjectWithSpecifiedKeys<
+  DestroyOptions<CompanyAllFields>
+> = {
+  where: io.partial(CompanyValidator.props),
 };
 
-export const DeleteCompanyValidator = io.type(CompanyDeleteFields_);
+export const DeleteCompanyValidator = io.type(CompanyDestroyOptions);
 export const DeleteCompaniesValidator = io.array(DeleteCompanyValidator);
-
-// All
-const CompanyAllFields_: ObjectWithSpecifiedKeys<CompanyAllFields> = {
-  ...CommonFields_,
-  ...CompanyCreateFields_,
-};
-
-export const CompanyValidator = io.type(CompanyAllFields_);
-export const CompaniesValidator = io.array(CompanyValidator);
