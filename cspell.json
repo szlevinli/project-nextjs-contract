@@ -1,3 +1,4 @@
 {
-  "words": ["vercel", "semigroup", "nextjs", "notistack", "fetchable"]
+  "words": ["vercel", "semigroup", "nextjs", "notistack", "fetchable"],
+  "ignorePaths": ["*.env.local"]
 }
