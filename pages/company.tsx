@@ -17,6 +17,7 @@ import {
 import { callAPI } from '../lib/utils/callAPI';
 import { ApiKeys } from '../lib/utils/const';
 import { CompaniesValidator } from '../lib/validations/validator';
+import { DestroyOptions } from 'sequelize';
 
 const callAddCompanyApi = callAPI<CompanyCreateFields, CompanyAllFields>(
   ApiKeys.COMPANY_CREATE
@@ -26,7 +27,7 @@ const callUpdateCompanyApi = callAPI<CompanyUpdateFields, number>(
   ApiKeys.COMPANY_UPDATE
 );
 
-const callDeleteCompanyApi = callAPI<CompanyDeleteFields, number>(
+const callDeleteCompanyApi = callAPI<DestroyOptions<CompanyAllFields>, number>(
   ApiKeys.COMPANY_DELETE
 );
 
@@ -67,7 +68,7 @@ const CompanyPage = () => {
 
   const handleDeleteCompany = (deleteCompany: CompanyDeleteFields) =>
     pipe(
-      callDeleteCompanyApi(deleteCompany),
+      callDeleteCompanyApi({ where: deleteCompany }),
       fold(
         (e) => callApiFailure(e.message),
         (d) => callApiSuccess(`成功删除 ${d.data} 记录`)
