@@ -7,38 +7,31 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { MouseEventHandler, useState } from 'react';
-import {
-  CompanyAllFields,
-  CompanyCreateFields,
-  CompanyUpdateFields,
-} from '../lib/sqlite/models';
+import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
 import { ACTION } from '../lib/utils/const';
+import { CRUDComponentProps, fold } from '../lib/utils/componentHelper';
 import {
   validateAbbr,
   validateName,
 } from '../lib/validations/companyValidation';
 import InputText from './InputText';
 
-export type FormDialogProp = {
+export type CRUDFormDialogProps<AllFields, BusinessFields> = {
   open: boolean;
   handleClose: () => void;
-  handleSubmit: (args?: CompanyCreateFields) => void;
-  data?: CompanyAllFields;
-  action?: ACTION;
+  componentProps: CRUDComponentProps<AllFields, BusinessFields>;
 };
 
 export const FormDialog = ({
   open,
   handleClose,
-  data,
-  handleSubmit,
-  action = ACTION.CREATE,
-}: FormDialogProp) => (
+  componentProps,
+}: CRUDFormDialogProps<CompanyAllFields, CompanyCreateFields>) => (
   <Dialog open={open} onClose={handleClose} fullWidth maxWidth={'md'}>
     <DialogTitle>Dialog Title</DialogTitle>
     <DialogContent>
       <DialogContentText>Dialog Content Text</DialogContentText>
-      <Company data={data} handleSubmit={handleSubmit} action={action} />
+      <Company {...componentProps} />
     </DialogContent>
     <DialogActions>
       <Button onClick={handleClose}>Cancel</Button>
@@ -46,51 +39,47 @@ export const FormDialog = ({
   </Dialog>
 );
 
-export type CompanyProps = {
-  data?: CompanyAllFields;
-  action?: ACTION;
-  handleSubmit: (company: CompanyCreateFields | CompanyUpdateFields) => unknown;
-};
+const Company = (
+  props: CRUDComponentProps<CompanyAllFields, CompanyCreateFields>
+) => {
+  const { name: originalName, abbr: originalAbbr } = fold(
+    props,
+    () => ({ name: '', abbr: '' }),
+    (data) => data,
+    (data) => data
+  );
 
-const Company = ({
-  data,
-  action = ACTION.CREATE,
-  handleSubmit,
-}: CompanyProps) => {
-  const [name, setName] = useState(data?.name || '');
+  const [name, setName] = useState(originalName);
   const [nameError, setNameError] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
 
-  const [abbr, setAbbr] = useState(data?.abbr || '');
+  const [abbr, setAbbr] = useState(originalAbbr);
   const [abbrError, setAbbrError] = useState(false);
   const [abbrTouched, setAbbrTouched] = useState(false);
 
+  const handleSubmit = fold(
+    props,
+    (create) => () => create({ name, abbr }),
+    (d, del) => () => del({ where: { id: d.id } }),
+    (d, update) => () => update({ name, abbr }, { where: { id: d.id } })
+  );
+
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
-    handleSubmit(
-      Object.assign(
-        {
-          name,
-          abbr,
-        },
-        action !== ACTION.CREATE ? { id: data.id } : {}
-      )
-    );
+    handleSubmit();
   };
 
   const isLegal = () => !nameError && !abbrError;
 
   const isTouched = () => nameTouched && abbrTouched;
 
-  const isDirty = () => {
-    const originName = data?.name || '';
-    const originAbbr = data?.abbr || '';
-    return originName === name && originAbbr === abbr;
-  };
+  const isDirty = () => originalName === name && originalAbbr === abbr;
 
-  const canSubmit = () =>
-    action === ACTION.CREATE
-      ? isTouched() && isLegal()
-      : !isDirty() && isLegal();
+  const canSubmit = fold(
+    props,
+    () => () => isTouched() && isLegal(),
+    () => () => !isDirty() && isLegal(),
+    () => () => !isDirty() && isLegal()
+  );
 
   return (
     <>
@@ -115,7 +104,13 @@ const Company = ({
       />
 
       <Button onClick={handleClick} disabled={!canSubmit()}>
-        {action === ACTION.CREATE ? '创建' : '修改'}
+        {props.type === ACTION.CREATE ? '创建' : '修改'}-
+        {fold(
+          props,
+          () => '创建',
+          () => '删除',
+          () => '更新'
+        )}
       </Button>
     </>
   );

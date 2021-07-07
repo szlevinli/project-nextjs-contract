@@ -9,12 +9,23 @@ import {
   CompanyDeleteFields,
 } from '../lib/sqlite/models';
 import { ACTION } from '../lib/utils/const';
+import { UpdateOptions } from 'sequelize';
+import {
+  create as createProps,
+  del as deleteProps,
+  modify as modifyProps,
+} from '../lib/utils/componentHelper';
 
 export type CompaniesProps = {
   data: CompanyAllFields[];
   handleAddCompany: (company: CompanyCreateFields) => Promise<any>;
-  handleUpdateCompany: (updateCompany: CompanyUpdateFields) => Promise<any>;
-  handleDeleteCompany: (deleteCompany: CompanyDeleteFields) => Promise<any>;
+  handleUpdateCompany: (
+    updateCompany: CompanyUpdateFields,
+    updateOptions: UpdateOptions<CompanyAllFields>
+  ) => Promise<any>;
+  handleDeleteCompany: (
+    deleteOptions: UpdateOptions<CompanyAllFields>
+  ) => Promise<any>;
   handleDelAllCompanies: () => Promise<unknown>;
 };
 
@@ -28,9 +39,6 @@ const Companies: React.FC<CompaniesProps> = ({
   const [open, setOpen] = React.useState(false);
   const [selectedCompany, setSelectedCompany] =
     React.useState<null | CompanyAllFields>(null);
-  const [handleSubmit, setHandleSubmit] = React.useState(() => () => {
-    console.log(`handle ok`);
-  });
   const [action, setAction] = React.useState(ACTION.CREATE);
 
   const handleClose = () => {
@@ -39,7 +47,6 @@ const Companies: React.FC<CompaniesProps> = ({
 
   const create = () => {
     setSelectedCompany(null);
-    setHandleSubmit(() => handleAddCompany);
     setAction(ACTION.CREATE);
     setOpen(true);
   };
@@ -47,7 +54,6 @@ const Companies: React.FC<CompaniesProps> = ({
   const modify = (id: number) => {
     const value = find<CompanyAllFields>(propEq('id', id))(data);
     setSelectedCompany(value);
-    setHandleSubmit(() => handleUpdateCompany);
     setAction(ACTION.MODIFY);
     setOpen(true);
   };
@@ -66,7 +72,9 @@ const Companies: React.FC<CompaniesProps> = ({
           <li key={v.id}>
             {v.id}: {JSON.stringify(v)}
             <Button onClick={() => modify(v.id)}>Modify</Button>
-            <Button onClick={() => handleDeleteCompany({ id: v.id })}>
+            <Button
+              onClick={() => handleDeleteCompany({ where: { id: v.id } })}
+            >
               Delete
             </Button>
           </li>
@@ -74,10 +82,14 @@ const Companies: React.FC<CompaniesProps> = ({
       </ul>
       <FormDialog
         open={open}
-        data={selectedCompany}
         handleClose={handleClose}
-        handleSubmit={handleSubmit}
-        action={action}
+        componentProps={
+          action === ACTION.CREATE
+            ? createProps(handleAddCompany)
+            : action === ACTION.DELETE
+            ? deleteProps(selectedCompany, handleDeleteCompany)
+            : modifyProps(selectedCompany, handleUpdateCompany)
+        }
       />
     </div>
   );
