@@ -17,15 +17,16 @@ import {
 import { callAPI } from '../lib/utils/callAPI';
 import { ApiKeys } from '../lib/utils/const';
 import { CompaniesValidator } from '../lib/validations/validator';
-import { DestroyOptions } from 'sequelize';
+import { DestroyOptions, UpdateOptions } from 'sequelize';
 
 const callAddCompanyApi = callAPI<CompanyCreateFields, CompanyAllFields>(
   ApiKeys.COMPANY_CREATE
 );
 
-const callUpdateCompanyApi = callAPI<CompanyUpdateFields, number>(
-  ApiKeys.COMPANY_UPDATE
-);
+const callUpdateCompanyApi = callAPI<
+  { values: CompanyUpdateFields; options: UpdateOptions<CompanyAllFields> },
+  number
+>(ApiKeys.COMPANY_UPDATE);
 
 const callDeleteCompanyApi = callAPI<DestroyOptions<CompanyAllFields>, number>(
   ApiKeys.COMPANY_DELETE
@@ -57,18 +58,26 @@ const CompanyPage = () => {
       )
     )();
 
-  const handleUpdateCompany = (updateCompany: CompanyUpdateFields) =>
+  const handleUpdateCompany = (
+    updateCompany: CompanyUpdateFields,
+    updateOptions: UpdateOptions<CompanyAllFields>
+  ) =>
     pipe(
-      callUpdateCompanyApi(updateCompany),
+      callUpdateCompanyApi({
+        values: updateCompany,
+        options: updateOptions,
+      }),
       fold(
         (e) => callApiFailure(e.message),
         (d) => callApiSuccess(`成功更新 ${d.data} 记录`)
       )
     )();
 
-  const handleDeleteCompany = (deleteCompany: CompanyDeleteFields) =>
+  const handleDeleteCompany = (
+    deleteOptions: DestroyOptions<CompanyAllFields>
+  ) =>
     pipe(
-      callDeleteCompanyApi({ where: deleteCompany }),
+      callDeleteCompanyApi(deleteOptions),
       fold(
         (e) => callApiFailure(e.message),
         (d) => callApiSuccess(`成功删除 ${d.data} 记录`)
