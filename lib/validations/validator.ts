@@ -1,6 +1,6 @@
 import * as io from 'io-ts';
 import * as t from 'io-ts-types';
-import { DestroyOptions } from 'sequelize';
+import { DestroyOptions, UpdateOptions } from 'sequelize';
 import {
   CommonFields,
   CompanyAllFields,
@@ -58,7 +58,23 @@ const CompanyUpdateFields_: ObjectWithSpecifiedKeys<CompanyUpdateFields> = {
   ...CompanyCreateFields_,
 };
 
-export const UpdateCompanyValidator = io.type(CompanyUpdateFields_);
+export const CompanyUpdateFieldsValidator = io.type(CompanyUpdateFields_);
+export const CompaniesUpdateFieldsValidator = io.array(
+  CompanyUpdateFieldsValidator
+);
+
+const CompanyUpdateOptions: ObjectWithSpecifiedKeys<
+  UpdateOptions<CompanyAllFields>
+> = {
+  where: io.partial(CompanyValidator.props),
+};
+
+const CompanyUpdateOptionsValidator = io.type(CompanyUpdateOptions);
+
+export const UpdateCompanyValidator = io.type({
+  values: io.partial(CompanyUpdateFieldsValidator.props),
+  options: CompanyUpdateOptionsValidator,
+});
 export const UpdateCompaniesValidator = io.array(UpdateCompanyValidator);
 
 // Delete
