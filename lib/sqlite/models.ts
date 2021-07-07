@@ -48,7 +48,7 @@ export type AllFields<T> = CommonFields & T;
 
 export type CreateFields<T> = T;
 
-export type UpdateFields<T> = PkFields & T;
+export type UpdateFields<T> = Partial<T>;
 
 export type DeleteFields = PkFields;
 
