@@ -1,30 +1,26 @@
 import { Button } from '@material-ui/core';
 import { find, propEq } from 'ramda';
 import React from 'react';
-import { UpdateOptions } from 'sequelize';
 import { FormDialog } from '../components/Company';
-import {
-  CompanyAllFields,
-  CompanyCreateFields,
-  CompanyUpdateFields,
-} from '../lib/sqlite/models';
+import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
 import {
   create as createProps,
-  del as deleteProps,
+  CreateRecordHandler,
+  CRUDComponentProps,
+  DeleteRecordHandler,
   modify as modifyProps,
+  UpdateRecordHandler,
 } from '../lib/utils/componentHelper';
-import { ACTION } from '../lib/utils/const';
+import { pipe } from 'fp-ts/function';
 
 export type CompaniesProps = {
   data: CompanyAllFields[];
-  handleAddCompany: (company: CompanyCreateFields) => Promise<any>;
-  handleUpdateCompany: (
-    updateCompany: CompanyUpdateFields,
-    updateOptions: UpdateOptions<CompanyAllFields>
-  ) => Promise<any>;
-  handleDeleteCompany: (
-    deleteOptions: UpdateOptions<CompanyAllFields>
-  ) => Promise<any>;
+  handleAddCompany: CreateRecordHandler<CompanyCreateFields>;
+  handleUpdateCompany: UpdateRecordHandler<
+    CompanyAllFields,
+    CompanyCreateFields
+  >;
+  handleDeleteCompany: DeleteRecordHandler<CompanyAllFields>;
 };
 
 const Companies: React.FC<CompaniesProps> = ({
@@ -34,24 +30,23 @@ const Companies: React.FC<CompaniesProps> = ({
   handleDeleteCompany,
 }) => {
   const [open, setOpen] = React.useState(false);
-  const [selectedCompany, setSelectedCompany] =
-    React.useState<null | CompanyAllFields>(null);
-  const [action, setAction] = React.useState(ACTION.CREATE);
+  const [componentProps, setComponentProps] =
+    React.useState<CRUDComponentProps<CompanyAllFields, CompanyCreateFields>>(
+      null
+    );
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const create = () => {
-    setSelectedCompany(null);
-    setAction(ACTION.CREATE);
+    pipe(handleAddCompany, createProps, setComponentProps);
     setOpen(true);
   };
 
   const modify = (id: number) => {
     const value = find<CompanyAllFields>(propEq('id', id))(data);
-    setSelectedCompany(value);
-    setAction(ACTION.MODIFY);
+    setComponentProps(modifyProps(value, handleUpdateCompany));
     setOpen(true);
   };
 
@@ -75,13 +70,7 @@ const Companies: React.FC<CompaniesProps> = ({
       <FormDialog
         open={open}
         handleClose={handleClose}
-        componentProps={
-          action === ACTION.CREATE
-            ? createProps(handleAddCompany)
-            : action === ACTION.DELETE
-            ? deleteProps(selectedCompany, handleDeleteCompany)
-            : modifyProps(selectedCompany, handleUpdateCompany)
-        }
+        componentProps={componentProps}
       />
     </div>
   );

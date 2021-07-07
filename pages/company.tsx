@@ -15,6 +15,11 @@ import {
   CompanyUpdateFields,
 } from '../lib/sqlite/models';
 import { callAPI } from '../lib/utils/callAPI';
+import {
+  CreateRecordHandler,
+  DeleteRecordHandler,
+  UpdateRecordHandler,
+} from '../lib/utils/componentHelper';
 import { ApiKeys } from '../lib/utils/const';
 import { CompaniesValidator } from '../lib/validations/validator';
 
@@ -44,7 +49,9 @@ const CompanyPage = () => {
     mutate(ApiKeys.COMPANY_READ);
   };
 
-  const handleAddCompany = (company: CompanyCreateFields) =>
+  const handleAddCompany: CreateRecordHandler<CompanyCreateFields> = (
+    company
+  ) =>
     pipe(
       callAddCompanyApi(company),
       fold(
@@ -53,10 +60,10 @@ const CompanyPage = () => {
       )
     )();
 
-  const handleUpdateCompany = (
-    updateCompany: CompanyUpdateFields,
-    updateOptions: UpdateOptions<CompanyAllFields>
-  ) =>
+  const handleUpdateCompany: UpdateRecordHandler<
+    CompanyAllFields,
+    CompanyCreateFields
+  > = (updateCompany, updateOptions) =>
     pipe(
       callUpdateCompanyApi({
         values: updateCompany,
@@ -68,8 +75,8 @@ const CompanyPage = () => {
       )
     )();
 
-  const handleDeleteCompany = (
-    deleteOptions: DestroyOptions<CompanyAllFields>
+  const handleDeleteCompany: DeleteRecordHandler<CompanyAllFields> = (
+    deleteOptions
   ) =>
     pipe(
       callDeleteCompanyApi(deleteOptions),
