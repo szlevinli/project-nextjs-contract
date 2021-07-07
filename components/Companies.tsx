@@ -1,20 +1,19 @@
 import { Button } from '@material-ui/core';
 import { find, propEq } from 'ramda';
 import React from 'react';
+import { UpdateOptions } from 'sequelize';
 import { FormDialog } from '../components/Company';
 import {
   CompanyAllFields,
   CompanyCreateFields,
   CompanyUpdateFields,
-  CompanyDeleteFields,
 } from '../lib/sqlite/models';
-import { ACTION } from '../lib/utils/const';
-import { UpdateOptions } from 'sequelize';
 import {
   create as createProps,
   del as deleteProps,
   modify as modifyProps,
 } from '../lib/utils/componentHelper';
+import { ACTION } from '../lib/utils/const';
 
 export type CompaniesProps = {
   data: CompanyAllFields[];
@@ -26,7 +25,6 @@ export type CompaniesProps = {
   handleDeleteCompany: (
     deleteOptions: UpdateOptions<CompanyAllFields>
   ) => Promise<any>;
-  handleDelAllCompanies: () => Promise<unknown>;
 };
 
 const Companies: React.FC<CompaniesProps> = ({
@@ -34,7 +32,6 @@ const Companies: React.FC<CompaniesProps> = ({
   handleAddCompany,
   handleUpdateCompany,
   handleDeleteCompany,
-  handleDelAllCompanies,
 }) => {
   const [open, setOpen] = React.useState(false);
   const [selectedCompany, setSelectedCompany] =
@@ -58,14 +55,9 @@ const Companies: React.FC<CompaniesProps> = ({
     setOpen(true);
   };
 
-  const deleteAll = () => {
-    handleDelAllCompanies();
-  };
-
   return (
     <div>
       <h1>Company</h1>
-      <button onClick={deleteAll}>Del All</button>
       <Button onClick={create}>New</Button>
       <ul>
         {data.map((v) => (

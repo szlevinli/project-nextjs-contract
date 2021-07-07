@@ -2,6 +2,7 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import { pipe } from 'fp-ts/lib/function';
 import { fold } from 'fp-ts/TaskEither';
 import { useSnackbar } from 'notistack';
+import { DestroyOptions, UpdateOptions } from 'sequelize';
 import { mutate } from 'swr';
 import Companies from '../components/Companies';
 import Err from '../components/Err';
@@ -12,12 +13,10 @@ import {
   CompanyAllFields,
   CompanyCreateFields,
   CompanyUpdateFields,
-  CompanyDeleteFields,
 } from '../lib/sqlite/models';
 import { callAPI } from '../lib/utils/callAPI';
 import { ApiKeys } from '../lib/utils/const';
 import { CompaniesValidator } from '../lib/validations/validator';
-import { DestroyOptions, UpdateOptions } from 'sequelize';
 
 const callAddCompanyApi = callAPI<CompanyCreateFields, CompanyAllFields>(
   ApiKeys.COMPANY_CREATE
@@ -30,10 +29,6 @@ const callUpdateCompanyApi = callAPI<
 
 const callDeleteCompanyApi = callAPI<DestroyOptions<CompanyAllFields>, number>(
   ApiKeys.COMPANY_DELETE
-);
-
-const callDelAllCompaniesApi = callAPI<unknown, { deleted_number: number }>(
-  ApiKeys.COMPANY_DELETE_ALL
 );
 
 const CompanyPage = () => {
@@ -84,16 +79,6 @@ const CompanyPage = () => {
       )
     )();
 
-  const handleDelAllCompanies = () =>
-    pipe(
-      callDelAllCompaniesApi(),
-      fold(
-        (e) => callApiFailure(e.message),
-        (d) =>
-          callApiSuccess(`清空 Companies 表(${d.data.deleted_number} 条记录)`)
-      )
-    )();
-
   return (
     <Fetchable
       url={ApiKeys.COMPANY_READ}
@@ -107,7 +92,6 @@ const CompanyPage = () => {
           handleAddCompany={handleAddCompany}
           handleUpdateCompany={handleUpdateCompany}
           handleDeleteCompany={handleDeleteCompany}
-          handleDelAllCompanies={handleDelAllCompanies}
         />
       )}
     />
