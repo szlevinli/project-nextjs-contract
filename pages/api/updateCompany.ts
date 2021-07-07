@@ -4,32 +4,33 @@ import { pipe } from 'fp-ts/function';
 import * as TE from 'fp-ts/TaskEither';
 import { formatValidationErrors } from 'io-ts-reporters';
 import { NextApiHandler } from 'next';
-import { join, omit } from 'ramda';
+import { join } from 'ramda';
+import { UpdateOptions } from 'sequelize';
 import { Company, CompanyUpdateFields } from '../../lib/sqlite/models';
-import { validateCompany } from '../../lib/validations/companyValidation';
+import { validateCompanyForUpdate } from '../../lib/validations/companyValidation';
 import { UpdateCompanyValidator } from '../../lib/validations/validator';
 
-const updateCompany = (company: CompanyUpdateFields) =>
-  TE.tryCatch(
-    () => Company.update(omit(['id'], company), { where: { id: company.id } }),
-    (reason) => new Error(String(reason))
-  );
+const updateCompany =
+  (company: CompanyUpdateFields) => (updateOptions: UpdateOptions) =>
+    TE.tryCatch(
+      () => Company.update(company, updateOptions),
+      (reason) => new Error(String(reason))
+    );
 
 const updateCompanyHandler: NextApiHandler = async (req, res) => {
+  // req.body: {values: CompanyUpdateFields, options: UpdateOptions}
   await pipe(
+    // validate type
     UpdateCompanyValidator.decode(req.body),
     E.mapLeft((e) => pipe(e, formatValidationErrors, join('\n'), Error)),
-    E.chain((d) =>
-      pipe(
-        validateCompany(omit(['id'], d)),
-        E.map((v) => ({ id: d.id, ...v }))
-      )
-    ),
+    // validate value
+    // 只需要对 values 进行值验证. options 无需进行进行值验证.
+    E.chainFirst((v) => validateCompanyForUpdate(v.values)),
     TE.fromEither,
-    TE.chain((d) => updateCompany(d)),
+    TE.chain((v) => updateCompany(v.values)(v.options)),
     TE.fold(
       (e) => async () => res.status(290).json(String(e)),
-      (d) => async () => res.status(200).json(d[0])
+      (v) => async () => res.status(200).json(v[0])
     )
   )();
 };
