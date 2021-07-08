@@ -48,6 +48,29 @@ export const fold = <AllFields, BusinessFields, R>(
     ? onDelete(fa.data, fa.handleSubmit)
     : onModify(fa.data, fa.handleSubmit);
 
+export const foldPointFree =
+  <AllFields, BusinessFields, R>(
+    fa: CRUDComponentProps<AllFields, BusinessFields>
+  ) =>
+  (onCreate: (handleSubmit: CreateRecordHandler<BusinessFields>) => R) =>
+  (
+    onDelete: (
+      data: AllFields,
+      handleSubmit: DeleteRecordHandler<AllFields>
+    ) => R
+  ) =>
+  (
+    onModify: (
+      data: AllFields,
+      handleSubmit: UpdateRecordHandler<AllFields, BusinessFields>
+    ) => R
+  ): R =>
+    fa.type === ACTION.CREATE
+      ? onCreate(fa.handleSubmit)
+      : fa.type === ACTION.DELETE
+      ? onDelete(fa.data, fa.handleSubmit)
+      : onModify(fa.data, fa.handleSubmit);
+
 export const create = <AllFields, BusinessFields>(
   handleSubmit: CreateRecordHandler<BusinessFields>
 ): CRUDComponentProps<AllFields, BusinessFields> => ({
