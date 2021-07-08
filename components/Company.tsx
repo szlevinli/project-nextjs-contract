@@ -8,8 +8,8 @@ import {
 } from '@material-ui/core';
 import { MouseEventHandler, useState } from 'react';
 import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
-import { ACTION } from '../lib/utils/const';
 import { CRUDComponentProps, fold } from '../lib/utils/componentHelper';
+import { ACTION } from '../lib/utils/const';
 import {
   validateAbbr,
   validateName,
