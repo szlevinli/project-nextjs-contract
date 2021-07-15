@@ -1,17 +1,29 @@
 import { Button } from '@material-ui/core';
-import { find, propEq } from 'ramda';
+import * as R from 'ramda';
 import React from 'react';
-import { FormDialog } from '../components/Company';
+import CRUDComponent from '../components/CRUDComponent';
+import FormDialog from '../components/CRUDFormDialog';
 import { CompanyAllFields, CompanyCreateFields } from '../lib/sqlite/models';
 import {
-  create as createProps,
+  create as handler4Create,
   CreateRecordHandler,
-  CRUDComponentProps,
+  CRUDHandler,
   DeleteRecordHandler,
-  modify as modifyProps,
+  modify as handler4Modify,
   UpdateRecordHandler,
 } from '../lib/utils/componentHelper';
-import { pipe } from 'fp-ts/function';
+import {
+  createInitState,
+  CRUDStoreAction,
+  CRUDStoreReducer,
+  CRUDStoreState,
+  setStateConstructor,
+  setValueConstructor,
+} from '../lib/utils/state';
+import {
+  validateAbbr,
+  validateName,
+} from '../lib/validations/companyValidation';
 
 export type CompaniesProps = {
   data: CompanyAllFields[];
@@ -29,24 +41,48 @@ const Companies: React.FC<CompaniesProps> = ({
   handleUpdateCompany,
   handleDeleteCompany,
 }) => {
+  const initState = createInitState<CompanyCreateFields>([
+    {
+      label: '名称',
+      key: 'name',
+      value: '',
+      validation: validateName,
+    },
+    {
+      label: '简称',
+      key: 'abbr',
+      value: '',
+      validation: validateAbbr,
+    },
+  ]);
   const [open, setOpen] = React.useState(false);
-  const [componentProps, setComponentProps] =
-    React.useState<CRUDComponentProps<CompanyAllFields, CompanyCreateFields>>(
-      null
-    );
+  const [handler, setHandler] = React.useState<
+    CRUDHandler<CompanyAllFields, CompanyCreateFields>
+  >(handler4Create(handleAddCompany));
+  const [state, dispatch] = React.useReducer<
+    React.Reducer<
+      CRUDStoreState<CompanyCreateFields>,
+      CRUDStoreAction<CompanyCreateFields>
+    >
+  >(CRUDStoreReducer, initState);
+  const [iState, setIState] = React.useState(initState);
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const create = () => {
-    pipe(handleAddCompany, createProps, setComponentProps);
+    dispatch(setStateConstructor(initState));
+    setHandler(handler4Create(handleAddCompany));
     setOpen(true);
   };
 
   const modify = (id: number) => {
-    const value = find<CompanyAllFields>(propEq('id', id))(data);
-    setComponentProps(modifyProps(value, handleUpdateCompany));
+    const value = R.find<CompanyAllFields>(R.propEq('id', id))(data);
+    const businessFields = R.pick(['name', 'abbr'], value);
+    dispatch(setStateConstructor(initState));
+    dispatch(setValueConstructor(businessFields));
+    setHandler(handler4Modify(value, handleUpdateCompany));
     setOpen(true);
   };
 
@@ -70,7 +106,10 @@ const Companies: React.FC<CompaniesProps> = ({
       <FormDialog
         open={open}
         handleClose={handleClose}
-        componentProps={componentProps}
+        handler={handler}
+        state={state}
+        dispatch={dispatch}
+        CRUDComponent={CRUDComponent}
       />
     </div>
   );

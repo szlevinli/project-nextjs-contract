@@ -1,4 +1,4 @@
-import { UpdateOptions, DestroyOptions } from 'sequelize/types';
+import { DestroyOptions, UpdateOptions } from 'sequelize/types';
 import { ACTION } from './const';
 
 export type CreateRecordHandler<BusinessFields> = (
@@ -14,7 +14,7 @@ export type UpdateRecordHandler<AllFields, BusinessFields> = (
   updateOptions: UpdateOptions<AllFields>
 ) => Promise<unknown>;
 
-export type CRUDComponentProps<AllFields, BusinessFields> =
+export type CRUDHandler<AllFields, BusinessFields> =
   | {
       type: ACTION.CREATE;
       handleSubmit: CreateRecordHandler<BusinessFields>;
@@ -31,7 +31,7 @@ export type CRUDComponentProps<AllFields, BusinessFields> =
     };
 
 export const fold = <AllFields, BusinessFields, R>(
-  fa: CRUDComponentProps<AllFields, BusinessFields>,
+  fa: CRUDHandler<AllFields, BusinessFields>,
   onCreate: (handleSubmit: CreateRecordHandler<BusinessFields>) => R,
   onDelete: (
     data: AllFields,
@@ -48,10 +48,33 @@ export const fold = <AllFields, BusinessFields, R>(
     ? onDelete(fa.data, fa.handleSubmit)
     : onModify(fa.data, fa.handleSubmit);
 
+export const create = <AllFields, BusinessFields>(
+  handleSubmit: CreateRecordHandler<BusinessFields>
+): CRUDHandler<AllFields, BusinessFields> => ({
+  type: ACTION.CREATE,
+  handleSubmit,
+});
+
+export const del = <AllFields, BusinessFields>(
+  data: AllFields,
+  handleSubmit: DeleteRecordHandler<AllFields>
+): CRUDHandler<AllFields, BusinessFields> => ({
+  type: ACTION.DELETE,
+  data,
+  handleSubmit,
+});
+
+export const modify = <AllFields, BusinessFields>(
+  data: AllFields,
+  handleSubmit: UpdateRecordHandler<AllFields, BusinessFields>
+): CRUDHandler<AllFields, BusinessFields> => ({
+  type: ACTION.MODIFY,
+  data,
+  handleSubmit,
+});
+
 export const foldPointFree =
-  <AllFields, BusinessFields, R>(
-    fa: CRUDComponentProps<AllFields, BusinessFields>
-  ) =>
+  <AllFields, BusinessFields, R>(fa: CRUDHandler<AllFields, BusinessFields>) =>
   (onCreate: (handleSubmit: CreateRecordHandler<BusinessFields>) => R) =>
   (
     onDelete: (
@@ -70,28 +93,3 @@ export const foldPointFree =
       : fa.type === ACTION.DELETE
       ? onDelete(fa.data, fa.handleSubmit)
       : onModify(fa.data, fa.handleSubmit);
-
-export const create = <AllFields, BusinessFields>(
-  handleSubmit: CreateRecordHandler<BusinessFields>
-): CRUDComponentProps<AllFields, BusinessFields> => ({
-  type: ACTION.CREATE,
-  handleSubmit,
-});
-
-export const del = <AllFields, BusinessFields>(
-  data: AllFields,
-  handleSubmit: DeleteRecordHandler<AllFields>
-): CRUDComponentProps<AllFields, BusinessFields> => ({
-  type: ACTION.DELETE,
-  data,
-  handleSubmit,
-});
-
-export const modify = <AllFields, BusinessFields>(
-  data: AllFields,
-  handleSubmit: UpdateRecordHandler<AllFields, BusinessFields>
-): CRUDComponentProps<AllFields, BusinessFields> => ({
-  type: ACTION.MODIFY,
-  data,
-  handleSubmit,
-});
