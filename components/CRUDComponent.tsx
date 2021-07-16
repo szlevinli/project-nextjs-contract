@@ -8,15 +8,17 @@ import {
 
 export type CRUDComponentProps<BusinessFields> = {
   entities: CRUDStoreState<BusinessFields>['entities'];
+  originalEntities: CRUDStoreState<BusinessFields>['entities'];
   dispatch: React.Dispatch<CRUDStoreAction<BusinessFields>>;
 };
 
 const CRUDComponent = <BusinessFields,>({
   entities,
+  originalEntities,
   dispatch,
 }: CRUDComponentProps<BusinessFields>) => (
   <>
-    {entities.map((v) => (
+    {entities.map((v, i) => (
       <Typography component={'span'} gutterBottom key={String(v.key)}>
         <Paper>
           <TextField
@@ -27,7 +29,13 @@ const CRUDComponent = <BusinessFields,>({
             helperText={v.helperText}
             value={v.value}
             onChange={(e) => {
-              dispatch(changeValueConstructor(v.key, e.target.value));
+              dispatch(
+                changeValueConstructor(
+                  v.key,
+                  e.target.value,
+                  originalEntities[i].value
+                )
+              );
               e.preventDefault();
             }}
           />

@@ -1,15 +1,15 @@
-import {
-  CRUDStoreReducer,
-  createInitState,
-  changeValueConstructor,
-  CRUDStoreState,
-  KeyFields,
-  setStateConstructor,
-  CRUDStoreAction,
-} from './state';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import R from 'ramda';
+import {
+  changeValueConstructor,
+  createInitState,
+  CRUDStoreAction,
+  CRUDStoreReducer,
+  CRUDStoreState,
+  KeyFields,
+  setStateConstructor,
+} from './state';
 
 type CreateFields = {
   name: string;
@@ -56,7 +56,8 @@ describe('Test CRUDStoreReducer', () => {
   it('[type: CHANGE_VALUE]: should be set `name`', () => {
     const changeName: CRUDStoreAction<CreateFields> = changeValueConstructor(
       'name',
-      'new name'
+      'new name',
+      ''
     );
 
     const expVal = pipe(
@@ -74,11 +75,13 @@ describe('Test CRUDStoreReducer', () => {
   it('[type: CHANGE_VALUE]: should be can submit', () => {
     const changeName: CRUDStoreAction<CreateFields> = changeValueConstructor(
       'name',
-      'new name'
+      'new name',
+      ''
     );
     const changeAbbr: CRUDStoreAction<CreateFields> = changeValueConstructor(
       'abbr',
-      'new abbr'
+      'new abbr',
+      ''
     );
 
     const expVal = pipe(
@@ -101,6 +104,7 @@ describe('Test CRUDStoreReducer', () => {
   it('[type: CHANGE_VALUE]: should be return error', () => {
     const changeAbbr: CRUDStoreAction<CreateFields> = changeValueConstructor(
       'abbr',
+      '',
       ''
     );
 

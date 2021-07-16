@@ -9,7 +9,12 @@ import {
 import React from 'react';
 import { PkFields } from '../lib/sqlite/models';
 import { CRUDHandler, fold } from '../lib/utils/componentHelper';
-import { CRUDStoreAction, CRUDStoreState, KeyFields } from '../lib/utils/state';
+import {
+  CRUDStoreAction,
+  CRUDStoreState,
+  KeyFields,
+  setStateConstructor,
+} from '../lib/utils/state';
 import { CRUDComponentProps } from './CRUDComponent';
 
 export type CRUDFormDialogProps<AllFields, BusinessFields> = {
@@ -32,6 +37,11 @@ const CRUDFormDialog = <
   dispatch,
   CRUDComponent,
 }: CRUDFormDialogProps<AllFields, BusinessFields>) => {
+  const [originalState, setOriginalState] = React.useState(state);
+  React.useEffect(() => {
+    setOriginalState(state);
+  }, [state.timestamp]);
+
   const buttonLabel = fold(
     handler,
     () => '创建',
@@ -51,7 +61,9 @@ const CRUDFormDialog = <
     (d, del) => () => del({ where: { id: d.id } }),
     (d, update) => () =>
       update(
-        state.entities.reduce(entitiesReduce, {}) as Partial<BusinessFields>,
+        state.entities
+          .filter((v) => v.isDirty)
+          .reduce(entitiesReduce, {}) as Partial<BusinessFields>,
         { where: { id: d.id } }
       )
   );
@@ -61,7 +73,11 @@ const CRUDFormDialog = <
       <DialogTitle>Dialog Title</DialogTitle>
       <DialogContent>
         <DialogContentText>Dialog Content Text</DialogContentText>
-        <CRUDComponent entities={state.entities} dispatch={dispatch} />
+        <CRUDComponent
+          entities={state.entities}
+          dispatch={dispatch}
+          originalEntities={originalState.entities}
+        />
       </DialogContent>
       <DialogActions>
         <Button
@@ -72,6 +88,9 @@ const CRUDFormDialog = <
           }}
         >
           {buttonLabel}
+        </Button>
+        <Button onClick={() => dispatch(setStateConstructor(originalState))}>
+          Reset
         </Button>
         <Button onClick={handleClose}>Cancel</Button>
       </DialogActions>

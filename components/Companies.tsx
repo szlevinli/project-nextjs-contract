@@ -12,13 +12,16 @@ import {
   modify as handler4Modify,
   UpdateRecordHandler,
 } from '../lib/utils/componentHelper';
+import { ACTION } from '../lib/utils/const';
 import {
   createInitState,
   CRUDStoreAction,
   CRUDStoreReducer,
   CRUDStoreState,
+  setActionConstructor,
+  setEntityConstructor,
   setStateConstructor,
-  setValueConstructor,
+  setTimestampConstructor,
 } from '../lib/utils/state';
 import {
   validateAbbr,
@@ -65,7 +68,6 @@ const Companies: React.FC<CompaniesProps> = ({
       CRUDStoreAction<CompanyCreateFields>
     >
   >(CRUDStoreReducer, initState);
-  const [iState, setIState] = React.useState(initState);
 
   const handleClose = () => {
     setOpen(false);
@@ -73,6 +75,8 @@ const Companies: React.FC<CompaniesProps> = ({
 
   const create = () => {
     dispatch(setStateConstructor(initState));
+    dispatch(setActionConstructor(ACTION.CREATE));
+    dispatch(setTimestampConstructor(Date.now()));
     setHandler(handler4Create(handleAddCompany));
     setOpen(true);
   };
@@ -81,7 +85,9 @@ const Companies: React.FC<CompaniesProps> = ({
     const value = R.find<CompanyAllFields>(R.propEq('id', id))(data);
     const businessFields = R.pick(['name', 'abbr'], value);
     dispatch(setStateConstructor(initState));
-    dispatch(setValueConstructor(businessFields));
+    dispatch(setActionConstructor(ACTION.MODIFY));
+    dispatch(setTimestampConstructor(Date.now()));
+    dispatch(setEntityConstructor(businessFields));
     setHandler(handler4Modify(value, handleUpdateCompany));
     setOpen(true);
   };
